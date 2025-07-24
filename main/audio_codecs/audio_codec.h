@@ -28,6 +28,11 @@ public:
     virtual bool InputData(std::vector<int16_t>& data);
     virtual void Start();
 
+    // 添加录音相关的虚函数
+    virtual esp_err_t StartRecording(std::function<void(const uint8_t*, size_t)> callback) { return ESP_OK; }
+    virtual esp_err_t StopRecording() { return ESP_OK; }
+    virtual bool IsRecording() { return false; }
+
     inline bool duplex() const { return duplex_; }
     inline bool input_reference() const { return input_reference_; }
     inline int input_sample_rate() const { return input_sample_rate_; }

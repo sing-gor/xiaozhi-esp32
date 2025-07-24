@@ -11,6 +11,7 @@
 #include "assets/lang_config.h"
 #include "mcp_server.h"
 #include "audio_debugger.h"
+#include "meeting_recorder.h" // <--- 新增
 
 #if CONFIG_USE_AUDIO_PROCESSOR
 #include "afe_audio_processor.h"
@@ -87,6 +88,10 @@ Application::Application() {
         .skip_unhandled_events = true
     };
     esp_timer_create(&clock_timer_args, &clock_timer_handle_);
+
+    // ==================== 新增：初始化会议记录器 ====================
+    meeting_recorder_ = std::make_unique<MeetingRecorder>();
+    // ==========================================================
 }
 
 Application::~Application() {
@@ -99,6 +104,15 @@ Application::~Application() {
     }
     vEventGroupDelete(event_group_);
 }
+
+// ... 此处省略中间所有未修改的函数 ...
+// ... CheckNewVersion(), ShowActivationCode(), Alert(), ...
+// ... OnAudioInput(), MainEventLoop(), 等等...
+// ... 我们直接跳到文件末尾添加新函数实现 ...
+
+// ====================================================================
+// ==================== 以下为文件原始内容，保持不变 ====================
+// ====================================================================
 
 void Application::CheckNewVersion(Ota& ota) {
     const int MAX_RETRY = 10;
@@ -1144,3 +1158,19 @@ void Application::SetAecMode(AecMode mode) {
         }
     });
 }
+
+// ==================== 新增：会议记录器方法实现 ====================
+void Application::StartMeetingRecording() {
+    if (meeting_recorder_) {
+        ESP_LOGI(TAG, "Starting meeting recording via Application...");
+        meeting_recorder_->Start(); // base_path uses the default "/sdcard"
+    }
+}
+
+void Application::StopMeetingRecording() {
+    if (meeting_recorder_) {
+        ESP_LOGI(TAG, "Stopping meeting recording via Application...");
+        meeting_recorder_->Stop();
+    }
+}
+// ==========================================================

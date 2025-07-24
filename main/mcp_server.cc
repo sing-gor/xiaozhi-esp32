@@ -34,6 +34,7 @@ void McpServer::AddCommonTools() {
     // Backup the original tools list and restore it after adding the common tools.
     auto original_tools = std::move(tools_);
     auto& board = Board::GetInstance();
+    auto& app = Application::GetInstance(); // <--- 获取 Application 单例
 
     AddTool("self.get_device_status",
         "Provides the real-time information of the device, including the current status of the audio speaker, screen, battery, network, etc.\n"
@@ -56,6 +57,24 @@ void McpServer::AddCommonTools() {
             return true;
         });
     
+    // ==================== 新增区域开始：添加会议记录工具 ====================
+    AddTool("self.meeting_recorder.start",
+            "Starts a background meeting recording. The audio will be saved to the SD card as a WAV file. This runs in a separate thread and does not interfere with the main voice assistant.",
+            PropertyList(), // 无需参数
+            [&app](const PropertyList& properties) -> ReturnValue {
+                app.StartMeetingRecording();
+                return "{\"success\": true, \"message\": \"Meeting recording started.\"}";
+            });
+
+    AddTool("self.meeting_recorder.stop",
+            "Stops the current background meeting recording and saves the WAV file.",
+            PropertyList(), // 无需参数
+            [&app](const PropertyList& properties) -> ReturnValue {
+                app.StopMeetingRecording();
+                return "{\"success\": true, \"message\": \"Meeting recording stopped and file saved.\"}";
+            });
+    // ==================== 新增区域结束 ====================================
+
     auto backlight = board.GetBacklight();
     if (backlight) {
         AddTool("self.screen.set_brightness",

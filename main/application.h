@@ -23,6 +23,7 @@
 #include "audio_processor.h"
 #include "wake_word.h"
 #include "audio_debugger.h"
+#include "meeting_recorder.h" // <--- 新增
 
 #define SCHEDULE_EVENT (1 << 0)
 #define SEND_AUDIO_EVENT (1 << 1)
@@ -84,6 +85,11 @@ public:
     AecMode GetAecMode() const { return aec_mode_; }
     BackgroundTask* GetBackgroundTask() const { return background_task_; }
 
+    // ==================== 新增：会议记录控制接口 ====================
+    void StartMeetingRecording();
+    void StopMeetingRecording();
+    // ==========================================================
+
 private:
     Application();
     ~Application();
@@ -91,6 +97,7 @@ private:
     std::unique_ptr<WakeWord> wake_word_;
     std::unique_ptr<AudioProcessor> audio_processor_;
     std::unique_ptr<AudioDebugger> audio_debugger_;
+    std::unique_ptr<MeetingRecorder> meeting_recorder_; // <--- 新增
     std::mutex mutex_;
     std::list<std::function<void()>> main_tasks_;
     std::unique_ptr<Protocol> protocol_;
